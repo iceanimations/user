@@ -11,7 +11,7 @@ import tactic_client_lib as tcl
 _present = None
 
 # change this get the server name/ip from a config file
-server_name = "tactic"
+server_name = "dbserver"
 
 
 server = tcl.TacticServerStub(setup = False)

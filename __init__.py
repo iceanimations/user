@@ -5,6 +5,39 @@ asd(r"r:/Pipe_Repo/Users/Hussain/utilities/TACTIC")
 
 import tactic_client_lib as tcl
 
+from socket import error as socketerror
+
+
+class TacticServer(object):
+    __retries__ = 1
+
+    def __init__(self, *args, **kwargs):
+        self.server = tcl.TacticServerStub.get(*args, **kwargs)
+
+    def __getattr__(self, name):
+        stub = self.server
+        attr = getattr(stub, name)
+        if type(attr) == type(getattr(stub, 'set_ticket')):
+            def _wrapper(*args, **kwargs):
+                for i in range(self.__retries__):
+                    try:
+                        return attr(*args, **kwargs)
+                    except socketerror:
+                        continue
+                return attr(*args, **kwargs)
+            return _wrapper
+        return attr
+
+    def login():
+        doc = "The login property."
+        def fget(self):
+            return self.server.get_login()
+        def fset(self, value):
+            self.server.login = value
+        return locals()
+    login = property(**login())
+
+
 # if the user have not registered to Maya in the current
 # Python session then `_present' will be `None'.
 
@@ -14,8 +47,9 @@ _present = None
 server_name = "dbserver"
 
 
-server = tcl.TacticServerStub(setup = False)
+server = TacticServer(setup = False)
 server.set_server(server_name)
+
 
 class _User(object):
     def __init__(self, login, ticket):
@@ -46,7 +80,6 @@ def get_server():
 def logout():
     global _present
     _present = server.login = server.ticket = None
-    
 
 
 def get_user():

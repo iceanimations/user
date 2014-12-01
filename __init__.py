@@ -12,7 +12,7 @@ class TacticServer(object):
     __retries__ = 1
 
     def __init__(self, *args, **kwargs):
-        self.server = tcl.TacticServerStub(*args, **kwargs)
+        self.server = tcl.TacticServerStub.get(*args, **kwargs)
 
     def __getattr__(self, name):
         stub = self.server
@@ -27,6 +27,15 @@ class TacticServer(object):
                 return attr(*args, **kwargs)
             return _wrapper
         return attr
+
+    def login():
+        doc = "The login property."
+        def fget(self):
+            return self.server.get_login()
+        def fset(self, value):
+            self.server.login = value
+        return locals()
+    login = property(**login())
 
 
 # if the user have not registered to Maya in the current

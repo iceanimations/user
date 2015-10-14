@@ -12,7 +12,7 @@ class TacticServer(object):
     __retries__ = 1
 
     def __init__(self, *args, **kwargs):
-        self.server = tcl.TacticServerStub.get(*args, **kwargs)
+        self.server = tcl.TacticServerStub(*args, **kwargs)
 
     def __getattr__(self, name):
         stub = self.server
@@ -44,9 +44,7 @@ class TacticServer(object):
 _present = None
 
 # change this get the server name/ip from a config file
-server_name = "blade-001"
-
-
+server_name = "dbserver"
 server = TacticServer(setup = False)
 server.set_server(server_name)
 
@@ -76,11 +74,18 @@ def get_server():
 
     else: raise Exception("User not logged in.")
 
+def get_server_copy():
+    if user_registered():
+        new_server = tcl.TacticServerStub(setup=False)
+        new_server.set_project(server.get_project())
+        new_server.set_server(server.get_server_name())
+        new_server.set_ticket(server.get_transaction_ticket())
+        return new_server
+    else: raise Exception("User not logged in.")
 
 def logout():
     global _present
     _present = server.login = server.ticket = None
-
 
 def get_user():
     if user_registered():
@@ -88,5 +93,3 @@ def get_user():
     else:
         raise Exception("User not registered")
 
-def get_server():
-    return server

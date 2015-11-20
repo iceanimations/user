@@ -44,7 +44,7 @@ class TacticServer(object):
 _present = None
 
 # change this get the server name/ip from a config file
-server_name = "blade-002"
+server_name = "dbserver"
 server = TacticServer(setup = False)
 server.set_server(server_name)
 

@@ -6,10 +6,13 @@ asd(r"r:/Pipe_Repo/Users/Hussain/utilities/TACTIC")
 import tactic_client_lib as tcl
 
 from socket import error as socketerror
+from xmlrpclib import ProtocolError
+
+import logging
 
 
 class TacticServer(object):
-    __retries__ = 1
+    __retries__ = 2
 
     def __init__(self, *args, **kwargs):
         self.server = tcl.TacticServerStub(*args, **kwargs)
@@ -22,8 +25,8 @@ class TacticServer(object):
                 for i in range(self.__retries__):
                     try:
                         return attr(*args, **kwargs)
-                    except socketerror:
-                        continue
+                    except (socketerror, ProtocolError) as e:
+                        logging.error('Swallowing a network Error: %s'%str(e))
                 return attr(*args, **kwargs)
             return _wrapper
         return attr

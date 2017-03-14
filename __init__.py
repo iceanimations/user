@@ -26,7 +26,7 @@ class TacticServer(object):
                     try:
                         return attr(*args, **kwargs)
                     except (socketerror, ProtocolError) as e:
-                        logging.error('Swallowing a network Error: %s'%str(e))
+                        logging.error('Swallowing a Network Error: %s'%str(e))
                 return attr(*args, **kwargs)
             return _wrapper
         return attr
@@ -47,7 +47,7 @@ class TacticServer(object):
 _present = None
 
 # change this get the server name/ip from a config file
-server_name = "ice-sql"
+server_name = "ice-tactic"
 server = TacticServer(setup = False)
 server.set_server(server_name)
 

@@ -92,7 +92,7 @@ class TacticServer(tcl.TacticServerStub):
 
     def log_in(self, login, password, project=None):
         ticket = self.get_ticket(login, password)
-        self.login = login
+        self.login = login.lower()
         self.set_ticket(ticket)
         if project:
             self.set_project(project)
@@ -111,6 +111,7 @@ _age_limit = 47 * 3600
 
 # change this get the server name/ip from a config file
 server_name = 'ice-tactic'
+
 
 def _mkdir(path):
     if os.path.exists(path):

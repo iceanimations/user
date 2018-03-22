@@ -1,17 +1,16 @@
 from site import addsitedir as asd
 asd(r"r:/Pipe_Repo/Users/Hussain/utilities/TACTIC")
 
-if True:
-    import tactic_client_lib as tcl
+import tactic_client_lib as tcl
 
-    from socket import error as socketerror
-    from xmlrpclib import ProtocolError, Fault
+from socket import error as socketerror
+from xmlrpclib import ProtocolError, Fault
 
-    import logging
-    import types
-    import os
-    import time
-    import getpass
+import logging
+import types
+import os
+import time
+import getpass
 
 
 class TacticUserException(tcl.TacticApiException):
@@ -42,6 +41,7 @@ class TacticServerMeta(type):
                 except (socketerror, ProtocolError) as e:
                     logging.error('Swallowing a Network Error: %s' % str(e))
             return func(self, *args, **kwargs)
+        _wrapper.__name__ = func.__name__
         _wrapper.__orig_func__ = func
         _wrapper.__doc__ = func.__doc__
         return _wrapper
@@ -107,6 +107,7 @@ class TacticServer(tcl.TacticServerStub):
 
 _present = True
 _server = None
+_project = None
 _age_limit = 47 * 3600
 
 # change this get the server name/ip from a config file
@@ -131,7 +132,7 @@ def _nascent_server():
 
 
 def _assign_server():
-    global _present, _server
+    global _present, _server, _project
 
     try:
         _server = TacticServer()
@@ -141,12 +142,14 @@ def _assign_server():
             if age > _age_limit:
                 raise TacticUserException()
         if not (_server.get_server_name() == server_name):
+            _server.project_code = ''
             raise TacticUserException("Server credentials don\'t match")
         _server.create_resource_path()
         _present = True
 
     except tcl.TacticApiException as exc:
         logging.warning(str(exc))
+        _project = _server.project_code
         _server = _nascent_server()
         _server.delete_resource_file()
         _present = None
@@ -192,6 +195,8 @@ def _create_resource_file():
 
 def login(login, password, project=None):
     global _present
+    if project is None:
+        project = _project
     if _server.log_in(login, password, project):
         _create_resource_file()
         _present = True
@@ -199,7 +204,8 @@ def login(login, password, project=None):
 
 
 def logout():
-    global _present
+    global _present, _project
+    _project = _server.project_code
     _server.log_out()
     _present = None
 

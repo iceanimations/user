@@ -67,7 +67,7 @@ class TacticServer(tcl.TacticServerStub):
                     file.write("login=%s\n" % self.login)
                     file.write("server=%s\n" % server_name)
                     file.write("ticket=%s\n" % self.get_transaction_ticket())
-                    if self.project_code:
+                    if getattr(self, 'project_code', None):
                         file.write("project=%s\n" % self.project_code)
             else:
                 raise TacticUserException("Cannot create resource dir")
@@ -149,7 +149,7 @@ def _assign_server():
 
     except tcl.TacticApiException as exc:
         logging.warning(str(exc))
-        _project = _server.project_code
+        _project = getattr(_server, 'project_code', None)
         _server = _nascent_server()
         _server.delete_resource_file()
         _present = None
@@ -205,7 +205,7 @@ def login(login, password, project=None):
 
 def logout():
     global _present, _project
-    _project = _server.project_code
+    _project = getattr(_server, 'project_code', None)
     _server.log_out()
     _present = None
 
